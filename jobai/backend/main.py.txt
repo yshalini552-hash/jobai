@@ -1,0 +1,20 @@
+from fastapi import FastAPI, UploadFile
+import pdfplumber
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+app = FastAPI()
+
+@app.post("/match")
+async def match(resume: UploadFile, job: str):
+    with pdfplumber.open(resume.file) as pdf:
+        text = ""
+        for page in pdf.pages:
+            text += page.extract_text()
+
+    corpus = [text, job]
+    tfidf = TfidfVectorizer()
+    matrix = tfidf.fit_transform(corpus)
+
+    score = cosine_similarity(matrix[0:1], matrix[1:2])[0][0]
+    return {"match_score": round(score * 100, 2)}

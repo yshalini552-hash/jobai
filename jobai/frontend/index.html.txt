@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>JobAI – AI Resume Matcher</h2>
+<input type="file" id="resume">
+<br><br>
+<textarea id="job" placeholder="Paste Job Description"></textarea>
+<br><br>
+<button onclick="match()">Match Resume</button>
+<p id="result"></p>
+
+<script>
+async function match(){
+  let form = new FormData()
+  form.append("resume", document.getElementById("resume").files[0])
+  form.append("job", document.getElementById("job").value)
+
+  let res = await fetch("/match",{ method:"POST", body:form })
+  let data = await res.json()
+
+  document.getElementById("result").innerText =
+   "Match Score: " + data.match_score + "%"
+}
+</script>
+</body>
+</html>
